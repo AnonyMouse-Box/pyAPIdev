@@ -15,5 +15,5 @@ CMD python run.py
 FROM base AS api
 RUN sed -i -e 's/web_page/web_api/g' https_server.py && \
   rm web_page.py && \
-  rm -r style web
+  rm -r web
 CMD python run.py
