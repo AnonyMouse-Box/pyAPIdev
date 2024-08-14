@@ -42,7 +42,7 @@ class WebRequestHandler(BaseHTTPRequestHandler):
 
     def get_response(self):
         data = b""
-        with open('index.html', 'rb') as file_in:
+        with open('web/index.html', 'rb') as file_in:
             data += file_in.read()
         return data
 
