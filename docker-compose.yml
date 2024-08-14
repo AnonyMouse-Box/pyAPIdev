@@ -1,0 +1,30 @@
+name: hindenburg
+
+services:
+  frontend:
+    container_name: "${FRONTEND_NAME}"
+    image: "${FRONTEND_NAME}:latest"
+    build:
+      context: .
+      dockerfile: ./dockerfiles/webapp.Dockerfile
+      target: frontend
+      tags:
+        - "${FRONTEND_NAME}:${FRONTEND_MAJOR_VERSION}"
+        - "${FRONTEND_NAME}:${FRONTEND_MAJOR_VERSION}.${FRONTEND_MINOR_VERSION}"
+        - "${FRONTEND_NAME}:${FRONTEND_MAJOR_VERSION}.${FRONTEND_MINOR_VERSION}.${FRONTEND_PATCH_VERSION}"
+    ports:
+      - 443:443
+
+  api:
+    container_name: "${API_NAME}"
+    image: "${API_NAME}:latest"
+    build:
+      context: .
+      dockerfile: ./dockerfiles/webapp.Dockerfile
+      target: api
+      tags:
+        - "${API_NAME}:${API_MAJOR_VERSION}"
+        - "${API_NAME}:${API_MAJOR_VERSION}.${API_MINOR_VERSION}"
+        - "${API_NAME}:${API_MAJOR_VERSION}.${API_MINOR_VERSION}.${API_PATCH_VERSION}"
+    ports:
+      - 8443:443
