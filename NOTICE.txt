@@ -1,0 +1,3 @@
+Much of the code in this project is modified from other sources:
+https://realpython.com/python-http-server/
+https://realpython.com/crud-operations/
