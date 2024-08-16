@@ -28,3 +28,17 @@ services:
         - "${API_NAME}:${API_MAJOR_VERSION}.${API_MINOR_VERSION}.${API_PATCH_VERSION}"
     ports:
       - "${API_EXTERNAL_PORT}:${API_INTERNAL_PORT}"
+
+  db:
+    container_name: "${DB_NAME}"
+    image: "${DB_NAME}:latest"
+    build:
+      context: .
+      dockerfile: ./dockerfiles/webapp.Dockerfile
+      target: db
+      tags:
+        - "${DB_NAME}:${DB_MAJOR_VERSION}"
+        - "${DB_NAME}:${DB_MAJOR_VERSION}.${DB_MINOR_VERSION}"
+        - "${DB_NAME}:${DB_MAJOR_VERSION}.${DB_MINOR_VERSION}.${DB_PATCH_VERSION}"
+    ports:
+      - "${DB_EXTERNAL_PORT}:${DB_INTERNAL_PORT}"
