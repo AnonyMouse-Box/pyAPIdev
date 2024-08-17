@@ -13,8 +13,9 @@ RUN rm web_api.py sql_server.py
 CMD python run.py
 
 FROM base AS api
-RUN python -m pip install SQLAlchemy
-RUN sed -i -e 's/web_page/web_api/g' https_server.py && \
+RUN python -m pip install SQLAlchemy mysql-connector-python
+RUN sed -i -E -e '21i \ \ \ \ sql_server.main()' -e 's/(import\ )(https_server)/\1sql_server,\ \2/g' core.py && \
+  sed -i -e 's/web_page/web_api/g' https_server.py && \
   rm web_page.py && \
   rm -r web
 CMD python run.py

@@ -10,6 +10,7 @@ from http.server import BaseHTTPRequestHandler
 from urllib.parse import parse_qsl, urlparse
 
 class WebRequestHandler(BaseHTTPRequestHandler):
+
     @cached_property
     def url(self):
         return urlparse(self.path)
