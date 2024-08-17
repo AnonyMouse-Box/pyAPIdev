@@ -1,3 +1,6 @@
+# Keep secrets out of source control
+secrets/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

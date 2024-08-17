@@ -12,6 +12,8 @@ services:
         - "${FRONTEND_NAME}:${FRONTEND_MAJOR_VERSION}"
         - "${FRONTEND_NAME}:${FRONTEND_MAJOR_VERSION}.${FRONTEND_MINOR_VERSION}"
         - "${FRONTEND_NAME}:${FRONTEND_MAJOR_VERSION}.${FRONTEND_MINOR_VERSION}.${FRONTEND_PATCH_VERSION}"
+    networks:
+      - pyapidev-frontend
     ports:
       - "${FRONTEND_EXTERNAL_PORT}:${FRONTEND_INTERNAL_PORT}"
 
@@ -26,19 +28,51 @@ services:
         - "${API_NAME}:${API_MAJOR_VERSION}"
         - "${API_NAME}:${API_MAJOR_VERSION}.${API_MINOR_VERSION}"
         - "${API_NAME}:${API_MAJOR_VERSION}.${API_MINOR_VERSION}.${API_PATCH_VERSION}"
+    networks:
+      - pyapidev-frontend
+      - pyapidev-backend
     ports:
       - "${API_EXTERNAL_PORT}:${API_INTERNAL_PORT}"
 
   db:
     container_name: "${DB_NAME}"
-    image: "${DB_NAME}:latest"
-    build:
-      context: .
-      dockerfile: ./dockerfiles/webapp.Dockerfile
-      target: db
-      tags:
-        - "${DB_NAME}:${DB_MAJOR_VERSION}"
-        - "${DB_NAME}:${DB_MAJOR_VERSION}.${DB_MINOR_VERSION}"
-        - "${DB_NAME}:${DB_MAJOR_VERSION}.${DB_MINOR_VERSION}.${DB_PATCH_VERSION}"
+    image: mysql:latest
+    restart: always
+    env_file: environment/db.env
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MYSQL_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+       - db_root_password
+       - db_password
+    networks:
+      - pyapidev-backend
+      - pyapidev-db
     ports:
       - "${DB_EXTERNAL_PORT}:${DB_INTERNAL_PORT}"
+  
+  db-gui:
+    container_name: "${GUI_NAME}"
+    image: phpmyadmin:latest
+    restart: always
+    env_file: environment/db-gui.env
+    depends_on:
+      - db
+    networks:
+      - pyapidev-db
+    ports:
+      - "${GUI_EXTERNAL_PORT}:${GUI_INTERNAL_PORT}"
+
+networks:
+  pyapidev-frontend:
+    driver: bridge
+  pyapidev-backend:
+    driver: bridge
+  pyapidev-db:
+    driver: bridge
+
+secrets:
+  db_password:
+    file: secrets/db_password.txt
+  db_root_password:
+    file: secrets/db_root_password.txt
