@@ -14,8 +14,11 @@ CMD python run.py
 
 FROM base AS api
 RUN python -m pip install SQLAlchemy mysql-connector-python
-RUN sed -i -E -e '21i \ \ \ \ sql_server.main()' -e 's/(import\ )(https_server)/\1sql_server,\ \2/g' core.py && \
-  sed -i -e 's/web_page/web_api/g' https_server.py && \
+RUN sed -i -E -e '21i \ \ \ \ session = sql_server.main()' \
+  -e 's/(import\ )(https_server)/\1sql_server,\ \2/g' \
+  -e 's/(https_server.parse_args\(\))/\1,\ session/g' core.py && \
+  sed -i -e 's/web_page/web_api/g' \
+  -e 's/WebRequestHandler/WebRequestHandler\(session\)/g' https_server.py && \
   rm web_page.py && \
   rm -r web
 CMD python run.py

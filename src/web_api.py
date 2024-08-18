@@ -7,9 +7,13 @@ import json
 from functools import cached_property
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler
+from socketserver import BaseServer
 from urllib.parse import parse_qsl, urlparse
 
 class WebRequestHandler(BaseHTTPRequestHandler):
+
+    def __init__(self, session):
+        self.session = session
 
     @cached_property
     def url(self):

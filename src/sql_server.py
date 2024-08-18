@@ -33,9 +33,7 @@ def init_db():
 def main():
     init_db()
     session = Session()
-    new_bird = Bird(name="Test Bird")
-    session.add(new_bird)
-    session.commit()
+    return session
 
 # Throw an error if run directly.
 try:
