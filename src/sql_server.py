@@ -13,7 +13,7 @@ class Base(DeclarativeBase):
 class Bird(Base):
     __tablename__ = "bird"
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    name = Column(String(40))
 
     def __repr__(self):
         return f"Bird(id={self.id}, name={self.name!r})"
@@ -25,13 +25,14 @@ port = urllib.parse.quote(os.environ.get("DB_PORT"), safe="")
 db_name = urllib.parse.quote(os.environ.get("MYSQL_DATABASE"), safe="")
 connection_string = f"mysql+mysqlconnector://{username}:{password}@{hostname}:{port}/{db_name}"
 engine = create_engine(connection_string, echo=True)
-session = sessionmaker(bind=engine)
+Session = sessionmaker(bind=engine)
 
 def init_db():
     Base.metadata.create_all(engine)
 
 def main():
     init_db()
+    session = Session()
     new_bird = Bird(name="Test Bird")
     session.add(new_bird)
     session.commit()
