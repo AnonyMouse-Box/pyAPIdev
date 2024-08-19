@@ -18,22 +18,27 @@ class Bird(Base):
     def __repr__(self):
         return f"Bird(id={self.id}, name={self.name!r})"
 
-username = urllib.parse.quote(os.environ.get("MYSQL_USER"), safe="")
-password = urllib.parse.quote(os.environ.get("DB_PASSWORD"), safe="")
-hostname = urllib.parse.quote(os.environ.get("DB_HOST"), safe="")
-port = urllib.parse.quote(os.environ.get("DB_PORT"), safe="")
-db_name = urllib.parse.quote(os.environ.get("MYSQL_DATABASE"), safe="")
-connection_string = f"mysql+mysqlconnector://{username}:{password}@{hostname}:{port}/{db_name}"
-engine = create_engine(connection_string, echo=True)
-Session = sessionmaker(bind=engine)
+session = None
 
 def init_db():
+    username = urllib.parse.quote(os.environ.get("MYSQL_USER"), safe="")
+    password = urllib.parse.quote(os.environ.get("DB_PASSWORD"), safe="")
+    hostname = urllib.parse.quote(os.environ.get("DB_HOST"), safe="")
+    port = urllib.parse.quote(os.environ.get("DB_PORT"), safe="")
+    db_name = urllib.parse.quote(os.environ.get("MYSQL_DATABASE"), safe="")
+    connection_string = f"mysql+mysqlconnector://{username}:{password}@{hostname}:{port}/{db_name}"
+    engine = create_engine(connection_string, echo=True)
     Base.metadata.create_all(engine)
-
-def main():
-    init_db()
+    Session = sessionmaker(bind=engine)
+    global session
     session = Session()
-    return session
+
+def create(db):
+    new_bird = Bird(name="Test Bird")
+    db.add(new_bird)
+    db.commit()
+    db.refresh(new_bird)
+    return new_bird
 
 # Throw an error if run directly.
 try:

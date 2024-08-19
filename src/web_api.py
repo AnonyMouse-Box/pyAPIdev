@@ -4,16 +4,13 @@
 # web_api.py
 
 import json
+import sql_server
 from functools import cached_property
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler
-from socketserver import BaseServer
 from urllib.parse import parse_qsl, urlparse
 
 class WebRequestHandler(BaseHTTPRequestHandler):
-
-    def __init__(self, session):
-        self.session = session
 
     @cached_property
     def url(self):
@@ -37,6 +34,7 @@ class WebRequestHandler(BaseHTTPRequestHandler):
         return SimpleCookie(self.headers.get("Cookie"))
 
     def do_GET(self):
+        sql_server.create(sql_server.session)
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.end_headers()

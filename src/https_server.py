@@ -11,7 +11,7 @@ from ssl import PROTOCOL_TLS_SERVER, SSLContext
 import web_page
 from self_signed import SelfSignedCertificate
 
-def main(args, session=None):
+def main(args, engine=None):
   ssl_context = SSLContext(PROTOCOL_TLS_SERVER)
   ssl_context.load_cert_chain(SelfSignedCertificate(args.host).path)
   server = HTTPServer((args.host, args.port), web_page.WebRequestHandler)
