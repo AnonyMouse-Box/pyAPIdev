@@ -4,7 +4,7 @@
 # sql_server.py
 
 import os, urllib.parse
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import select, create_engine, Column, Integer, String
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 class Base(DeclarativeBase):
@@ -17,6 +17,9 @@ class Bird(Base):
 
     def __repr__(self):
         return f"Bird(id={self.id}, name={self.name!r})"
+    
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 session = None
 
@@ -32,13 +35,44 @@ def init_db():
     Session = sessionmaker(bind=engine)
     global session
     session = Session()
+    # remove below after testing
+    new_bird = Bird(name="Eagle")
+    session.add(new_bird)
+    session.commit()
+    session.refresh(new_bird)
 
-def create(db):
-    new_bird = Bird(name="Test Bird")
+def create_bird(db, bird):
+    new_bird = Bird(name=bird.name)
     db.add(new_bird)
     db.commit()
     db.refresh(new_bird)
     return new_bird
+
+def read_birds(db):
+    return db.execute(select(Bird)).scalars().all()
+
+def read_bird(db, bird_id):
+    query = select(Bird).where(Bird.id == bird_id)
+    return db.execute(query).scalar_one_or_none()
+
+def update_bird(db, bird_id, bird):
+    query = select(Bird).where(Bird.id == bird_id)
+    bird_found = db.execute(query).scalar_one_or_none()
+    if bird_found is not None:
+        bird_found.name = bird.name
+        db.commit()
+        db.refresh(bird_found)
+    return bird_found
+
+def delete_bird(db, bird_id):
+    query = select(Bird).where(Bird.id == bird_id)
+    bird_found = db.execute(query).scalar_one_or_none()
+    response["message"] = "Bird not found."
+    if bird_found is not None:
+        db.delete(bird_found)
+        db.commit()
+        response["message"] = "Bird deleted."
+    return response
 
 # Throw an error if run directly.
 try:

@@ -3,7 +3,7 @@
 
 # web_api.py
 
-import json
+import json, re
 import sql_server
 from functools import cached_property
 from http.cookies import SimpleCookie
@@ -33,15 +33,27 @@ class WebRequestHandler(BaseHTTPRequestHandler):
     def cookies(self):
         return SimpleCookie(self.headers.get("Cookie"))
 
-    def do_GET(self):
-        sql_server.create(sql_server.session)
-        self.send_response(200)
-        self.send_header("Content-Type", "application/json")
-        self.end_headers()
-        self.wfile.write(self.get_response().encode("utf-8"))
-
     def do_POST(self):
+        sql_server.create(sql_server.session)
         self.do_GET()
+
+    def do_GET(self):
+        root = re.compile("^\/birds\/?$")
+        sub = re.compile("^\/birds\/(\d+)\/?$")
+        item_found = None
+        if root.fullmatch(self.url.path):
+            item_found = sql_server.read_birds(sql_server.session)
+        elif sub.fullmatch(self.url.path):
+            item_found = sql_server.read_bird(sql_server.session, sub.fullmatch(self.url.path).group(1))
+        if item_found is not None:
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps([item.as_dict() for item in item_found]).encode("utf-8"))
+        else:
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write(b'Item not found.')
 
     def get_response(self):
         return json.dumps(
