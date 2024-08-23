@@ -35,14 +35,9 @@ def init_db():
     Session = sessionmaker(bind=engine)
     global session
     session = Session()
-    # remove below after testing
-    new_bird = Bird(name="Eagle")
-    session.add(new_bird)
-    session.commit()
-    session.refresh(new_bird)
 
 def create_bird(db, bird):
-    new_bird = Bird(name=bird.name)
+    new_bird = Bird(name=bird["name"])
     db.add(new_bird)
     db.commit()
     db.refresh(new_bird)
@@ -59,7 +54,7 @@ def update_bird(db, bird_id, bird):
     query = select(Bird).where(Bird.id == bird_id)
     bird_found = db.execute(query).scalar_one_or_none()
     if bird_found is not None:
-        bird_found.name = bird.name
+        bird_found.name = bird["name"]
         db.commit()
         db.refresh(bird_found)
     return bird_found
@@ -67,7 +62,7 @@ def update_bird(db, bird_id, bird):
 def delete_bird(db, bird_id):
     query = select(Bird).where(Bird.id == bird_id)
     bird_found = db.execute(query).scalar_one_or_none()
-    response["message"] = "Bird not found."
+    response = {"message": "Item not found."}
     if bird_found is not None:
         db.delete(bird_found)
         db.commit()
