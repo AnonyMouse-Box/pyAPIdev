@@ -57,7 +57,7 @@ services:
        - db_password
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 15s
+      interval: 20s
     networks:
       - pyapidev-backend
       - pyapidev-db
