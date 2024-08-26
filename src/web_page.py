@@ -47,6 +47,10 @@ class WebRequestHandler(BaseHTTPRequestHandler):
                 self.send_header('Content-Length', 0)
                 self.end_headers()
                 return
+            elif self.path.endswith(".png"):
+                self.send_header('Content-Type', 'image/png')
+            elif self.path.endswith(".jpg"):
+                self.send_header('Content-Type', 'image/jpg')
             self.end_headers()
             self.wfile.write(bytes(self.get_response(os.path.join('.', self.path[1:]))))
         except IOError:
